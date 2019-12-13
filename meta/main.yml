@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: nginx_letsencrypt
   author: Julien Palard
   description: Minimalist setup of letsencrypt with nginx
   issue_tracker_url: https://github.com/JulienPalard/nginx-letsencrypt
