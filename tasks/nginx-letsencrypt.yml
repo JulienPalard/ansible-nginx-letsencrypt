@@ -1,0 +1,35 @@
+---
+
+- name: Install nginx and certbot for letsencrypt
+  package:
+    state: present
+    name:
+      - nginx
+      - certbot
+      - python-certbot-nginx
+
+- name: Create SSL dhparam
+  command: openssl dhparam -out /etc/ssl/certs/dhparam.pem {{ dhparam_numbits }}
+  args:
+    creates: /etc/ssl/certs/dhparam.pem
+
+- name: Check if the certificate already exists
+  stat:
+    path: '/etc/letsencrypt/live/{{ item }}'
+  with_items: '{{ domains }}'
+  register: certificate_exists
+
+- name: Create a new certificate
+  shell: 'certbot certonly --cert-name {{ item.item }} -n --agree-tos -d {{ item.item }} -m {{ letsencrypt_email }} --nginx --rsa-key-size {{ rsa_key_size }}'
+  with_items: '{{ certificate_exists.results }}'
+  when: not item.stat.exists
+  loop_control:
+    label: "{{ item.item }}"
+
+- name: Create letsencrypt snippets
+  template:
+    src: letsencrypt.conf.j2
+    dest: '/etc/nginx/snippets/{{ snippet_prefix }}{{ item.item }}.conf'
+  with_items: '{{ certificate_exists.results }}'
+  loop_control:
+    label: "{{ item.item }}"

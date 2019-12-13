@@ -1,0 +1,12 @@
+galaxy_info:
+  author: Julien Palard
+  description: Minimalist setup of letsencrypt with nginx
+  issue_tracker_url: https://github.com/JulienPalard/nginx-letsencrypt
+  license: MIT
+  min_ansible_version: 2.9
+  platforms:
+    - name: Debian
+      versions:
+        - 10
+        - 100
+  galaxy_tags: [letsencrypt, web, https, nginx, networking, system, certificates, certbot]

@@ -1,0 +1,12 @@
+ssl_ciphers "{{ ssl_ciphers }}";
+ssl_protocols {{ ssl_protocols }};
+ssl_prefer_server_ciphers {{ ssl_prefer_server_ciphers }};
+ssl_session_cache {{ ssl_session_cache }};
+ssl_certificate /etc/letsencrypt/live/{{ item.item }}/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/{{ item.item }}/privkey.pem;
+ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+# Uncomment to enable HSTS:
+{% if HSTS_header %}
+add_header {{ HSTS_header }};
+{% endif %}
