@@ -1,12 +1,5 @@
 ---
 
-- debug:
-    msg: "{{ certificates }}"
-
-- debug:
-    msg: "{{ item }}"
-  loop: '{{ certificates }}'
-
 - name: Install nginx and certbot for letsencrypt
   package:
     state: present
