@@ -1,5 +1,12 @@
 ---
 
+- debug:
+    msg: "{{ certificates }}"
+
+- debug:
+    msg: "{{ item }}"
+  loop: '{{ certificates }}'
+
 - name: Install nginx and certbot for letsencrypt
   package:
     state: present
@@ -15,21 +22,21 @@
 
 - name: Check if the certificate already exists
   stat:
-    path: '/etc/letsencrypt/live/{{ item }}'
-  with_items: '{{ domains }}'
+    path: '/etc/letsencrypt/live/{{ item[0] }}'
+  loop: '{{ certificates }}'
   register: certificate_exists
 
 - name: Create a new certificate
-  shell: 'certbot certonly --cert-name {{ item.item }} -n --agree-tos -d {{ item.item }} -m {{ letsencrypt_email }} --nginx --rsa-key-size {{ rsa_key_size }}'
-  with_items: '{{ certificate_exists.results }}'
+  shell: 'certbot certonly --cert-name {{ item.item[0] }} -n --agree-tos -d {{ item.item | join(",") }} -m {{ letsencrypt_email }} --nginx --rsa-key-size {{ rsa_key_size }}'
+  loop: '{{ certificate_exists.results }}'
   when: not item.stat.exists
   loop_control:
-    label: "{{ item.item }}"
+    label: "{{ item.item[0] }}"
 
 - name: Create letsencrypt snippets
   template:
     src: letsencrypt.conf.j2
-    dest: '/etc/nginx/snippets/{{ snippet_prefix }}{{ item.item }}.conf'
-  with_items: '{{ certificate_exists.results }}'
+    dest: '/etc/nginx/snippets/{{ snippet_prefix }}{{ item.item[0] }}.conf'
+  loop: '{{ certificate_exists.results }}'
   loop_control:
-    label: "{{ item.item }}"
+    label: "{{ item.item[0] }}"

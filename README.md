@@ -11,7 +11,9 @@ configure nginx yourself as you which.
 Role Variables
 --------------
 
-The only mandatory variable is: `letsencrypt_email`.
+The only mandatory variables are:
+- `certificates`: A list of certificates, each being a list of domain names.
+- `letsencrypt_email`: Your email address.
 
 Optional variables are:
 
@@ -28,29 +30,83 @@ Optional variables are:
 Example Playbook
 ----------------
 
-This role fits nicely as another role dependency, like in a `meta/main.yml`:
+One certificate, one domain
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-```
-dependencies:
-  - role: nginx-letsencrypt
-    domains: ["{{ domain }}"]
-```
-
-Don't forget the `[]`, as `domains` is a list, you can create multiple HTTPS certificates at the same time, like:
+Simpliest playbook with a single certificate and a single domain would
+look like:
 
 ```yaml
-dependencies:
-  - role: nginx-letsencrypt
-  domains: {{ projects|map(attribute='fqdn')|list }}
-```
-
-But it could also work standalone in a playbook:
-
-```yaml
-- hosts: my_pelican
+- hosts: static_websites
   roles:
-    - { role: letsencrypt, domains: [mdk.fr] }
+    - role: julienpalard.nginx_letsencrypt
+      vars:
+        certificates: [[mdk.fr]]
+        letsencrypt_email: julien@palard.fr
 ```
+
+Note the double brackets, it's because we're asking for a *single*
+domain in a *single* certificate, see following examples for
+clarification.
+
+
+One certificate, multiple domains
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Just add your domains to the inner list, like:
+
+```yaml
+- hosts: static_websites
+  roles:
+    - role: julienpalard.nginx_letsencrypt
+      vars:
+        certificates: [[mdk.fr, www.mdk.fr]]
+        letsencrypt_email: julien@palard.fr
+```
+
+
+Multiple certificates, multiple domains
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following playbook will generate three differnt certificates, the
+first one valid for mdk.fr, www.mdk.fr, and julien.palard.fr, the
+second one for wyz.fr and www.wyz.fr and the last one valid for tuw.fr
+and www.tuz.fr:
+
+```yaml
+- hosts: static_websites
+  roles:
+    - role: julienpalard.nginx_letsencrypt
+      vars:
+        certificates:
+          - [mdk.fr, www.mdk.fr, julien.palard.fr]
+          - [wyz.fr, www.wyz.fr]
+          - [tuw.fr, www.tuw.fr]
+        letsencrypt_email: julien@palard.fr
+```
+
+
+As a role dependency
+~~~~~~~~~~~~~~~~~~~~
+
+This role should fit nicely as another role dependency, like in a
+`meta/main.yml`, but this currently does not work due to
+https://github.com/ansible/ansible/issues/34736.
+
+```yaml
+dependencies:
+  - role: julienpalard.nginx_letsencrypt
+    certificates: [["{{ domain }}"]]
+```
+
+or
+
+```yaml
+dependencies:
+  - role: julienpalard.nginx_letsencrypt
+  certificates: {{ projects|map(attribute='fqdn')|list }}
+```
+
 
 
 License
