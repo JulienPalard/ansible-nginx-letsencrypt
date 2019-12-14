@@ -1,5 +1,4 @@
-Nginx with Letsencrypt
-======================
+# Nginx with Letsencrypt
 
 This role sets up nginx with letsencrypt.
 
@@ -8,8 +7,7 @@ It tries to be minimal by just creating snippets in
 configure nginx yourself as you which.
 
 
-Role Variables
---------------
+## Role Variables
 
 The only mandatory variables are:
 - `certificates`: A list of certificates, each being a list of domain names.
@@ -27,11 +25,9 @@ Optional variables are:
 - HSTS_header (`Strict-Transport-Security "max-age=63072000; includeSubDomains"`): HTTP header to inject.
 
 
-Example Playbook
-----------------
+## Example Playbook
 
-One certificate, one domain
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### One certificate, one domain
 
 Simpliest playbook with a single certificate and a single domain would
 look like:
@@ -50,8 +46,7 @@ domain in a *single* certificate, see following examples for
 clarification.
 
 
-One certificate, multiple domains
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### One certificate, multiple domains
 
 Just add your domains to the inner list, like:
 
@@ -65,8 +60,7 @@ Just add your domains to the inner list, like:
 ```
 
 
-Multiple certificates, multiple domains
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Multiple certificates, multiple domains
 
 The following playbook will generate three differnt certificates, the
 first one valid for mdk.fr, www.mdk.fr, and julien.palard.fr, the
@@ -86,8 +80,7 @@ and www.tuz.fr:
 ```
 
 
-As a role dependency
-~~~~~~~~~~~~~~~~~~~~
+### As a role dependency
 
 This role should fit nicely as another role dependency, like in a
 `meta/main.yml`, but this currently does not work due to
@@ -109,13 +102,11 @@ dependencies:
 
 
 
-License
--------
+### License
 
 MIT
 
 
-Author Information
-------------------
+### Author Information
 
 Julien Palard — https://mdk.fr
