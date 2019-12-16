@@ -82,24 +82,33 @@ and www.tuz.fr:
 
 ### As a role dependency
 
-This role should fit nicely as another role dependency, like in a
-`meta/main.yml`, but this currently does not work due to
-https://github.com/ansible/ansible/issues/34736.
+This role fit nicely as another role dependency (in `meta/main.yml`),
+but do not use `roles`, use `include_role`, see
+[ansible#34736](https://github.com/ansible/ansible/issues/34736):
 
 ```yaml
 dependencies:
   - role: julienpalard.nginx_letsencrypt
-    certificates: [["{{ domain }}"]]
+    vars:
+      certificates: [["{{ domain }}"]]
 ```
 
-or
+Or to concatenate a domain with a list of extra domains:
 
 ```yaml
 dependencies:
   - role: julienpalard.nginx_letsencrypt
-  certificates: {{ projects|map(attribute='fqdn')|list }}
+    vars:
+      certificates: ["{{ [domain] | union(extra_certificates) }}"]
 ```
 
+You can even extract the domain names from attributes of a map:
+
+```yaml
+dependencies:
+  - role: julienpalard.nginx_letsencrypt
+    certificates: {{ projects|map(attribute='domain')|list }}
+```
 
 
 ### License
