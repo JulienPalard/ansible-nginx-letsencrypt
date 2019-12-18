@@ -16,7 +16,7 @@
 - name: Check if the certificate already exists
   stat:
     path: '/etc/letsencrypt/live/{{ item[0] }}'
-  loop: '{{ certificates }}'
+  loop: '{{ letsencrypt_certificates }}'
   register: certificate_exists
 
 - name: Create a new certificate

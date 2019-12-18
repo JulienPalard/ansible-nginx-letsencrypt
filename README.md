@@ -10,7 +10,7 @@ configure nginx yourself as you which.
 ## Role Variables
 
 The only mandatory variables are:
-- `certificates`: A list of certificates, each being a list of domain names.
+- `letsencrypt_certificates`: A list of certificates, each being a list of domain names.
 - `letsencrypt_email`: Your email address.
 
 Optional variables are:
@@ -37,7 +37,7 @@ look like:
   roles:
     - role: julienpalard.nginx_letsencrypt
       vars:
-        certificates: [[mdk.fr]]
+        letsencrypt_certificates: [[mdk.fr]]
         letsencrypt_email: julien@palard.fr
 ```
 
@@ -55,7 +55,7 @@ Just add your domains to the inner list, like:
   roles:
     - role: julienpalard.nginx_letsencrypt
       vars:
-        certificates: [[mdk.fr, www.mdk.fr]]
+        letsencrypt_certificates: [[mdk.fr, www.mdk.fr]]
         letsencrypt_email: julien@palard.fr
 ```
 
@@ -72,7 +72,7 @@ and www.tuz.fr:
   roles:
     - role: julienpalard.nginx_letsencrypt
       vars:
-        certificates:
+        letsencrypt_certificates:
           - [mdk.fr, www.mdk.fr, julien.palard.fr]
           - [wyz.fr, www.wyz.fr]
           - [tuw.fr, www.tuw.fr]
@@ -90,7 +90,7 @@ but do not use `roles`, use `include_role`, see
 dependencies:
   - role: julienpalard.nginx_letsencrypt
     vars:
-      certificates: [["{{ domain }}"]]
+      letsencrypt_certificates: [["{{ domain }}"]]
 ```
 
 Or to concatenate a domain with a list of extra domains:
@@ -99,7 +99,7 @@ Or to concatenate a domain with a list of extra domains:
 dependencies:
   - role: julienpalard.nginx_letsencrypt
     vars:
-      certificates: ["{{ [domain] | union(extra_certificates) }}"]
+      letsencrypt_certificates: ["{{ [domain] | union(extra_certificates) }}"]
 ```
 
 You can even extract the domain names from attributes of a map:
@@ -107,7 +107,7 @@ You can even extract the domain names from attributes of a map:
 ```yaml
 dependencies:
   - role: julienpalard.nginx_letsencrypt
-    certificates: {{ projects|map(attribute='domain')|list }}
+    letsencrypt_certificates: {{ projects|map(attribute='domain')|list }}
 ```
 
 
