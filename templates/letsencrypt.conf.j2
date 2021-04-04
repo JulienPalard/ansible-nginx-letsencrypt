@@ -1,10 +1,17 @@
 ssl_ciphers "{{ ssl_ciphers }}";
 ssl_protocols {{ ssl_protocols }};
 ssl_prefer_server_ciphers {{ ssl_prefer_server_ciphers }};
+
 ssl_session_cache {{ ssl_session_cache }};
-ssl_certificate /etc/letsencrypt/live/{{ item.item[0] }}/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/{{ item.item[0] }}/privkey.pem;
+ssl_session_timeout 1d;
+ssl_session_tickets off;
+
+ssl_certificate /etc/letsencrypt/live/{{ item[0] }}/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/{{ item[0] }}/privkey.pem;
 ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+ssl_stapling on;
+ssl_stapling_verify on;
 
 # Uncomment to enable HSTS:
 {% if HSTS_header %}

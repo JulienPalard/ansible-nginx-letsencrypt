@@ -9,27 +9,35 @@
       - python-certbot-nginx
 
 - name: Create SSL dhparam
-  command: openssl dhparam -out /etc/ssl/certs/dhparam.pem {{ dhparam_numbits }}
-  args:
-    creates: /etc/ssl/certs/dhparam.pem
+  get_url:
+    url: https://ssl-config.mozilla.org/ffdhe2048.txt
+    dest: /etc/ssl/certs/dhparam.pem
+    mode: 0644
 
-- name: Check if the certificate already exists
-  stat:
-    path: '/etc/letsencrypt/live/{{ item[0] }}'
+# This is usefull in case nginx already has an include to this file,
+# to avoid nginx to fail parsing its configuration when certbot
+# modifies it.
+- name: Create letsencrypt snippets files
+  file:
+    path: '/etc/nginx/snippets/{{ snippet_prefix }}{{ item[0] }}.conf'
+    state: file
+    mode: 0644
   loop: '{{ letsencrypt_certificates }}'
-  register: certificate_exists
+  loop_control:
+    label: "{{ item[0] }}"
 
 - name: Create a new certificate
-  shell: 'certbot certonly --cert-name {{ item.item[0] }} -n --agree-tos -d {{ item.item | join(",") }} -m {{ letsencrypt_email }} --nginx --rsa-key-size {{ rsa_key_size }}'
-  loop: '{{ certificate_exists.results }}'
-  when: not item.stat.exists
+  shell: 'certbot certonly --cert-name {{ item[0] }} -n --agree-tos -d {{ item | join(",") }} -m {{ letsencrypt_email }} --nginx --rsa-key-size {{ rsa_key_size }}'
+  loop: '{{ letsencrypt_certificates }}'
   loop_control:
-    label: "{{ item.item[0] }}"
+    label: "{{ item[0] }}"
+  register: certbot
+  changed_when: '"Cert not yet due for renewal" not in certbot.stderr'
 
 - name: Create letsencrypt snippets
   template:
     src: letsencrypt.conf.j2
-    dest: '/etc/nginx/snippets/{{ snippet_prefix }}{{ item.item[0] }}.conf'
-  loop: '{{ certificate_exists.results }}'
+    dest: '/etc/nginx/snippets/{{ snippet_prefix }}{{ item[0] }}.conf'
+  loop: '{{ letsencrypt_certificates }}'
   loop_control:
-    label: "{{ item.item[0] }}"
+    label: "{{ item[0] }}"
