@@ -6,6 +6,7 @@
     name:
       - nginx
       - certbot
+      - ca-certificates
       - python-certbot-nginx
 
 - name: Create SSL dhparam

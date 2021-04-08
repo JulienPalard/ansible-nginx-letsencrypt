@@ -1,3 +1,5 @@
+# Inspired from
+# https://ssl-config.mozilla.org/#server=nginx&version=1.14.2&config=intermediate&openssl=1.1.1d&guideline=5.6
 ssl_ciphers "{{ ssl_ciphers }}";
 ssl_protocols {{ ssl_protocols }};
 ssl_prefer_server_ciphers {{ ssl_prefer_server_ciphers }};
@@ -12,8 +14,8 @@ ssl_dhparam /etc/ssl/certs/dhparam.pem;
 
 ssl_stapling on;
 ssl_stapling_verify on;
+ssl_trusted_certificate /etc/ssl/certs/ca-certificates.crt;
 
-# Uncomment to enable HSTS:
 {% if HSTS_header %}
 add_header {{ HSTS_header }};
 {% endif %}
